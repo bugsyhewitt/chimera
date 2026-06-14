@@ -1,0 +1,121 @@
+%YAML 1.1
+---
+# CHIMERA P04 — minimal Suricata config (Suricata 8.x / jasonish image).
+#
+# Wi-Fi topology note: the build host has NO wired gateway to mirror (mgmt iface
+# is wlp0s20f3). For P04 the goal is only that Suricata STARTS CLEANLY and emits
+# eve.json. We therefore capture on the container's own interface (eth0 inside
+# the chimera_dmz bridge) via af-packet. eth0 always exists inside the container,
+# so the capture thread comes up cleanly regardless of host Wi-Fi state.
+# Full production traffic-mirroring (SPAN/tap of real DMZ traffic) is refined in
+# a later packet.
+
+vars:
+  address-groups:
+    HOME_NET: "[172.30.0.0/16]"
+    EXTERNAL_NET: "!$HOME_NET"
+    HTTP_SERVERS: "$HOME_NET"
+    SMTP_SERVERS: "$HOME_NET"
+    SQL_SERVERS: "$HOME_NET"
+    DNS_SERVERS: "$HOME_NET"
+    TELNET_SERVERS: "$HOME_NET"
+    DC_SERVERS: "$HOME_NET"
+  port-groups:
+    HTTP_PORTS: "80"
+    SHELLCODE_PORTS: "!80"
+    ORACLE_PORTS: 1521
+    SSH_PORTS: 22
+    DNP3_PORTS: 20000
+    MODBUS_PORTS: 502
+    FILE_DATA_PORTS: "[$HTTP_PORTS,110,143]"
+    FTP_PORTS: 21
+    GENEVE_PORTS: 6081
+    VXLAN_PORTS: 4789
+    TEREDO_PORTS: 3544
+
+default-log-dir: /var/log/suricata/
+
+stats:
+  enabled: yes
+
+# ---- EVE JSON output (P04 spec: alert, flow, http) ----
+outputs:
+  - fast:
+      enabled: no
+      filename: fast.log
+
+  - eve-log:
+      enabled: yes
+      filetype: regular
+      filename: eve.json
+      pcap-file: false
+      community-id: true
+      community-id-seed: 0
+      types:
+        - alert:
+            tagged-packets: yes
+        - http:
+            extended: yes
+        - flow
+
+  - stats:
+      enabled: yes
+      filename: stats.log
+      totals: yes
+      threads: no
+
+logging:
+  default-log-level: notice
+  outputs:
+    - console:
+        enabled: yes
+    - file:
+        enabled: yes
+        level: info
+        filename: /var/log/suricata/suricata.log
+
+# ---- Capture (af-packet on the container's bridge iface) ----
+af-packet:
+  - interface: eth0
+    cluster-id: 99
+    cluster-type: cluster_flow
+    defrag: yes
+    use-mmap: yes
+    tpacket-v3: yes
+  - interface: default
+
+# Required engine sections (kept at safe defaults).
+app-layer:
+  protocols:
+    http:
+      enabled: yes
+    tls:
+      enabled: yes
+    ssh:
+      enabled: yes
+    dns:
+      tcp:
+        enabled: yes
+      udp:
+        enabled: yes
+
+flow:
+  memcap: 128mb
+  hash-size: 65536
+  prealloc: 10000
+  emergency-recovery: 30
+
+stream:
+  memcap: 64mb
+  checksum-validation: yes
+  reassembly:
+    memcap: 256mb
+    depth: 1mb
+
+# No external rules needed for P04 (we only need flow/http/alert plumbing to
+# prove eve.json emission). A ruleset is layered in a later packet.
+default-rule-path: /var/lib/suricata/rules
+rule-files: []
+
+host-mode: auto
+runmode: autofp

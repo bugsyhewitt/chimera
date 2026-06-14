@@ -1,0 +1,192 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1320" viewBox="0 0 1080 1320" font-family="Segoe UI, Helvetica, Arial, sans-serif">
+  <!-- ================= CHIMERA architecture (V3X) ================= -->
+  <!-- Layered: sensors+honeypots (isolated net) -> UF -> Splunk core -> orchestrator loop -> dashboard -->
+
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#444c5c"/>
+    </marker>
+    <marker id="arrowMcp" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#7b4bd8"/>
+    </marker>
+    <marker id="arrowLoop" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#0b6e4f"/>
+    </marker>
+    <style>
+      .layer { fill:#ffffff; stroke:#c7cdd6; stroke-width:1.5; rx:10; }
+      .ltitle { font-size:13px; font-weight:700; fill:#5a6472; letter-spacing:1px; }
+      .box { rx:8; stroke-width:1.5; }
+      .btitle { font-size:14px; font-weight:700; }
+      .bsub { font-size:11px; fill:#5a6472; }
+      .flow { stroke:#444c5c; stroke-width:2; fill:none; }
+      .flowmcp { stroke:#7b4bd8; stroke-width:2.5; fill:none; }
+      .flowloop { stroke:#0b6e4f; stroke-width:2; fill:none; }
+      .flbl { font-size:10.5px; fill:#444c5c; font-style:italic; }
+      .flblmcp { font-size:10.5px; fill:#7b4bd8; font-weight:700; }
+    </style>
+  </defs>
+
+  <rect width="1080" height="1320" fill="#f4f6f9"/>
+
+  <!-- Title -->
+  <text x="540" y="40" text-anchor="middle" font-size="26" font-weight="800" fill="#1b2330">CHIMERA</text>
+  <text x="540" y="62" text-anchor="middle" font-size="13" fill="#5a6472">Splunk-native deception orchestrator — detect · test · route · classify · adapt · report</text>
+
+  <!-- ============ LAYER 1: SENSORS + HONEYPOTS (isolated net) ============ -->
+  <rect class="layer" x="40" y="86" width="1000" height="190" rx="10"/>
+  <text class="ltitle" x="60" y="108">ISOLATED DOCKER NETWORK — SENSORS + HONEYPOTS</text>
+
+  <!-- Suricata -->
+  <rect class="box" x="70" y="124" width="200" height="80" fill="#e8f0fe" stroke="#3b78e7"/>
+  <text class="btitle" x="170" y="152" text-anchor="middle" fill="#1b2330">Suricata</text>
+  <text class="bsub" x="170" y="170" text-anchor="middle">IDS / flow signatures</text>
+  <text class="bsub" x="170" y="186" text-anchor="middle">eve.json</text>
+
+  <!-- Zeek -->
+  <rect class="box" x="290" y="124" width="200" height="80" fill="#e8f0fe" stroke="#3b78e7"/>
+  <text class="btitle" x="390" y="152" text-anchor="middle" fill="#1b2330">Zeek</text>
+  <text class="bsub" x="390" y="170" text-anchor="middle">conn / http / dns metadata</text>
+  <text class="bsub" x="390" y="186" text-anchor="middle">behavioral context</text>
+
+  <!-- Honeypots cluster -->
+  <rect class="box" x="520" y="118" width="490" height="138" fill="#fdecef" stroke="#d9455f"/>
+  <text class="btitle" x="765" y="140" text-anchor="middle" fill="#1b2330">Honeypots</text>
+  <rect class="box" x="538" y="152" width="148" height="86" fill="#ffffff" stroke="#d9455f"/>
+  <text x="612" y="178" text-anchor="middle" font-size="13" font-weight="700" fill="#1b2330">Cowrie</text>
+  <text class="bsub" x="612" y="196" text-anchor="middle">SSH/Telnet</text>
+  <text class="bsub" x="612" y="212" text-anchor="middle">human trap</text>
+  <rect class="box" x="694" y="152" width="148" height="86" fill="#ffffff" stroke="#d9455f"/>
+  <text x="768" y="178" text-anchor="middle" font-size="13" font-weight="700" fill="#1b2330">Galah</text>
+  <text class="bsub" x="768" y="196" text-anchor="middle">HTTP</text>
+  <text class="bsub" x="768" y="212" text-anchor="middle">scanner/AI trap</text>
+  <rect class="box" x="850" y="152" width="148" height="86" fill="#ffffff" stroke="#7b4bd8"/>
+  <text x="924" y="178" text-anchor="middle" font-size="13" font-weight="700" fill="#1b2330">Beelzebub</text>
+  <text class="bsub" x="924" y="196" text-anchor="middle">MCP decoy</text>
+  <text class="bsub" x="924" y="212" text-anchor="middle">tripwire</text>
+
+  <!-- flows into UF -->
+  <path class="flow" d="M170,204 L170,300" marker-end="url(#arrow)"/>
+  <path class="flow" d="M390,204 L390,300" marker-end="url(#arrow)"/>
+  <path class="flow" d="M765,256 L765,288 L540,288 L540,300" marker-end="url(#arrow)"/>
+  <text class="flbl" x="185" y="296">eve.json</text>
+  <text class="flbl" x="405" y="296">logs</text>
+  <text class="flbl" x="556" y="284">session logs</text>
+
+  <!-- ============ LAYER 2: UNIVERSAL FORWARDER ============ -->
+  <rect class="box" x="280" y="300" width="520" height="56" rx="10" fill="#fff7e6" stroke="#e0a106"/>
+  <text x="540" y="326" text-anchor="middle" font-size="15" font-weight="700" fill="#1b2330">Splunk Universal Forwarder  +  MCP TA</text>
+  <text class="bsub" x="540" y="344" text-anchor="middle">ingests sensor + honeypot logs into Splunk</text>
+
+  <path class="flow" d="M540,356 L540,392" marker-end="url(#arrow)"/>
+
+  <!-- ============ LAYER 3: SPLUNK CORE ============ -->
+  <rect class="layer" x="40" y="392" width="1000" height="180" rx="10" fill="#eef6f1" stroke="#0b6e4f"/>
+  <text class="ltitle" x="60" y="414" fill="#0b6e4f">SPLUNK CORE — the reasoning &amp; data plane</text>
+
+  <rect class="box" x="64" y="428" width="200" height="60" fill="#ffffff" stroke="#0b6e4f"/>
+  <text x="164" y="454" text-anchor="middle" font-size="13" font-weight="700" fill="#1b2330">idx_network</text>
+  <text class="bsub" x="164" y="472" text-anchor="middle">sensor data</text>
+  <rect class="box" x="280" y="428" width="200" height="60" fill="#ffffff" stroke="#0b6e4f"/>
+  <text x="380" y="454" text-anchor="middle" font-size="13" font-weight="700" fill="#1b2330">idx_honeypot</text>
+  <text class="bsub" x="380" y="472" text-anchor="middle">Cowrie/Galah/Beelzebub</text>
+  <rect class="box" x="496" y="428" width="200" height="60" fill="#ffffff" stroke="#0b6e4f"/>
+  <text x="596" y="454" text-anchor="middle" font-size="13" font-weight="700" fill="#1b2330">idx_deception</text>
+  <text class="bsub" x="596" y="472" text-anchor="middle">CHIMERA decisions</text>
+
+  <rect class="box" x="64" y="500" width="440" height="56" fill="#efe7fb" stroke="#7b4bd8"/>
+  <text x="284" y="524" text-anchor="middle" font-size="14" font-weight="700" fill="#1b2330">Splunk MCP Server</text>
+  <text class="bsub" x="284" y="542" text-anchor="middle">OAuth 2.1 · RBAC · search exposed as agent tools</text>
+
+  <rect class="box" x="520" y="500" width="494" height="56" fill="#fff7e6" stroke="#e0a106"/>
+  <text x="767" y="524" text-anchor="middle" font-size="14" font-weight="700" fill="#1b2330">Foundation-Sec-8B  (self-hosted via Ollama)</text>
+  <text class="bsub" x="767" y="542" text-anchor="middle">deceptive content · engagement reports</text>
+
+  <!-- MCP bidirectional link to orchestrator -->
+  <path class="flowmcp" d="M284,556 L284,620" marker-end="url(#arrowMcp)"/>
+  <path class="flowmcp" d="M320,620 L320,556" marker-end="url(#arrowMcp)"/>
+  <text class="flblmcp" x="300" y="592" text-anchor="middle">MCP (streamable HTTP, OAuth 2.1)</text>
+  <text class="flblmcp" x="300" y="606" text-anchor="middle">read events  ·  write-back</text>
+
+  <!-- ============ LAYER 4: ORCHESTRATOR LOOP ============ -->
+  <rect class="layer" x="40" y="620" width="1000" height="430" rx="10" fill="#eef6f1" stroke="#0b6e4f"/>
+  <text class="ltitle" x="60" y="642" fill="#0b6e4f">CHIMERA ORCHESTRATOR — the V3X submission (async Python, MCP client)</text>
+
+  <!-- Row A: detect -> SPRT -> router -->
+  <rect class="box" x="64" y="660" width="200" height="74" fill="#ffffff" stroke="#0b6e4f"/>
+  <text x="164" y="690" text-anchor="middle" font-size="13.5" font-weight="700" fill="#1b2330">Detection consumer</text>
+  <text class="bsub" x="164" y="710" text-anchor="middle">pulls idx_network /</text>
+  <text class="bsub" x="164" y="724" text-anchor="middle">idx_honeypot via MCP</text>
+
+  <rect class="box" x="300" y="660" width="200" height="74" fill="#ffffff" stroke="#0b6e4f"/>
+  <text x="400" y="686" text-anchor="middle" font-size="13.5" font-weight="700" fill="#1b2330">SPRT classifier</text>
+  <text class="bsub" x="400" y="705" text-anchor="middle">Wald α=0.01 β=0.05</text>
+  <text class="bsub" x="400" y="721" text-anchor="middle">hostile? (Λ vs A/B)</text>
+
+  <rect class="box" x="536" y="660" width="200" height="74" fill="#ffffff" stroke="#0b6e4f"/>
+  <text x="636" y="686" text-anchor="middle" font-size="13.5" font-weight="700" fill="#1b2330">Router /</text>
+  <text x="636" y="703" text-anchor="middle" font-size="13.5" font-weight="700" fill="#1b2330">deception gateway</text>
+  <text class="bsub" x="636" y="722" text-anchor="middle">HOSTILE → honeypot</text>
+
+  <path class="flowloop" d="M264,697 L300,697" marker-end="url(#arrowLoop)"/>
+  <path class="flowloop" d="M500,697 L536,697" marker-end="url(#arrowLoop)"/>
+  <text class="flbl" x="282" y="690" text-anchor="middle" fill="#0b6e4f">events</text>
+  <text class="flbl" x="518" y="690" text-anchor="middle" fill="#0b6e4f">HOSTILE</text>
+
+  <!-- down from router to classifier row -->
+  <path class="flowloop" d="M636,734 L636,768" marker-end="url(#arrowLoop)"/>
+
+  <!-- Row B: 3-channel classifier -> POMDP -->
+  <rect class="box" x="300" y="768" width="436" height="120" fill="#ffffff" stroke="#0b6e4f"/>
+  <text x="518" y="792" text-anchor="middle" font-size="13.5" font-weight="700" fill="#1b2330">3-channel AI / human classifier</text>
+  <text class="bsub" x="518" y="812" text-anchor="middle">1 · timing  (K–S + entropy)  — screen</text>
+  <text class="bsub" x="518" y="830" text-anchor="middle">2 · behavioral lure-pursuit  — medium</text>
+  <text x="518" y="850" text-anchor="middle" font-size="11.5" font-weight="700" fill="#7b4bd8">3 · inverted-PromptArmor MCP tripwire — decisive</text>
+  <text class="bsub" x="518" y="870" text-anchor="middle">→ posterior p_ai  (live: p_ai = 0.9997)</text>
+
+  <rect class="box" x="772" y="768" width="242" height="120" fill="#ffffff" stroke="#0b6e4f"/>
+  <text x="893" y="792" text-anchor="middle" font-size="13.5" font-weight="700" fill="#1b2330">POMDP controller</text>
+  <text class="bsub" x="893" y="814" text-anchor="middle">belief over</text>
+  <text class="bsub" x="893" y="830" text-anchor="middle">{benign, human, AI}</text>
+  <text class="bsub" x="893" y="852" text-anchor="middle">breadcrumb intensity:</text>
+  <text class="bsub" x="893" y="868" text-anchor="middle">subtle (human) /</text>
+  <text class="bsub" x="893" y="882" text-anchor="middle">aggressive (AI)</text>
+
+  <path class="flowloop" d="M736,828 L772,828" marker-end="url(#arrowLoop)"/>
+  <text class="flbl" x="754" y="821" text-anchor="middle" fill="#0b6e4f">p_ai</text>
+
+  <!-- down to reporter -->
+  <path class="flowloop" d="M893,888 L893,920 L518,920 L518,944" marker-end="url(#arrowLoop)"/>
+
+  <!-- Row C: reporter / write-back -->
+  <rect class="box" x="120" y="944" width="800" height="84" fill="#fff7e6" stroke="#e0a106"/>
+  <text x="520" y="970" text-anchor="middle" font-size="14" font-weight="700" fill="#1b2330">Reporter / write-back  (Foundation-Sec-8B)</text>
+  <text class="bsub" x="520" y="992" text-anchor="middle">engagement report: MITRE ATT&amp;CK + MITRE Engage + recommended SPL</text>
+  <text class="bsub" x="520" y="1010" text-anchor="middle">writes session_summary → idx_deception  ·  persists detection as a real Splunk saved search</text>
+
+  <!-- write-back arrow up to Splunk core (MCP + REST) -->
+  <path class="flowmcp" d="M120,986 L80,986 L80,300 L80,408 L80,500" fill="none" stroke="#7b4bd8" stroke-width="2.5" stroke-dasharray="6,4"/>
+  <path class="flowmcp" d="M80,512 L80,500" marker-end="url(#arrowMcp)" stroke="#7b4bd8"/>
+  <text class="flblmcp" x="92" y="660" transform="rotate(-90 92 660)" text-anchor="middle">write-back: idx_deception + saved search</text>
+
+  <!-- orchestrator -> dashboard -->
+  <path class="flow" d="M540,1050 L540,1086" marker-end="url(#arrow)"/>
+
+  <!-- ============ LAYER 5: DASHBOARD ============ -->
+  <rect class="box" x="200" y="1086" width="680" height="96" rx="10" fill="#e8f0fe" stroke="#3b78e7"/>
+  <text x="540" y="1112" text-anchor="middle" font-size="15" font-weight="700" fill="#1b2330">CHIMERA dashboard  (Splunk app)</text>
+  <text class="bsub" x="540" y="1134" text-anchor="middle">chimera_overview · chimera_metrics</text>
+  <text x="540" y="1158" text-anchor="middle" font-size="13" font-weight="700" fill="#0b6e4f">dwell time ▲ 821s vs 49s (16.7×)   ·   penetration probability ▼ ~0%</text>
+  <text class="bsub" x="540" y="1174" text-anchor="middle">live belief states · SPRT score · verdicts</text>
+
+  <!-- Footer / legend -->
+  <text x="60" y="1218" font-size="12" font-weight="700" fill="#5a6472">Data flow legend:</text>
+  <line x1="180" y1="1214" x2="220" y2="1214" stroke="#444c5c" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="228" y="1218" font-size="11.5" fill="#444c5c">log ingest / presentation</text>
+  <line x1="420" y1="1214" x2="460" y2="1214" stroke="#7b4bd8" stroke-width="2.5" marker-end="url(#arrowMcp)"/>
+  <text x="468" y="1218" font-size="11.5" fill="#7b4bd8">MCP (OAuth 2.1) read + write-back</text>
+  <line x1="740" y1="1214" x2="780" y2="1214" stroke="#0b6e4f" stroke-width="2" marker-end="url(#arrowLoop)"/>
+  <text x="788" y="1218" font-size="11.5" fill="#0b6e4f">orchestrator loop</text>
+
+  <text x="540" y="1262" text-anchor="middle" font-size="12" fill="#5a6472">V3X — Splunk Agentic Ops Hackathon, Security track. Open framework; commercial detection plugins available separately.</text>
+  <text x="540" y="1284" text-anchor="middle" font-size="11" fill="#9aa3b0">Stack: Splunk Enterprise 10.4.0 + MCP Server · Suricata/Zeek · Cowrie/Galah/Beelzebub · Universal Forwarder · Python asyncio orchestrator · Foundation-Sec-8B (Ollama)</text>
+</svg>

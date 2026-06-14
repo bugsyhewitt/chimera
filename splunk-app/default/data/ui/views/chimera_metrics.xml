@@ -1,0 +1,207 @@
+<dashboard version="1.1" theme="dark">
+  <label>CHIMERA Metrics (Tier 3)</label>
+  <description>Tier-3 outcome metrics for the CHIMERA adaptive-deception orchestrator: dwell time, penetration probability, live POMDP belief state, and the headline dwell-uplift comparison (WITH vs WITHOUT CHIMERA). Auto-refresh 30s.</description>
+
+  <!-- ================= ROW 1: THE MONEY CHART ================= -->
+  <row>
+    <panel>
+      <title>THE MONEY CHART — Average Dwell Time: WITH CHIMERA vs WITHOUT</title>
+      <html>
+        <div style="padding:4px 10px 0 10px;color:#aaa;font-size:12px;">
+          Higher dwell = attacker held longer in the deception layer. A static honeypot earns a brief, suspicious visit;
+          CHIMERA's adaptive breadcrumbs (aggressive for AI, subtle for humans) keep attackers engaged far longer — while
+          penetration stays at zero. Bars below are clearly-labeled synthetic demo cohorts (synthetic=true).
+        </div>
+      </html>
+      <chart>
+        <search>
+          <query>index=idx_deception type=session_summary synthetic=true scenario IN (baseline_static_honeypot,chimera_adaptive)
+| eval cohort=case(scenario=="chimera_adaptive","WITH CHIMERA",scenario=="baseline_static_honeypot","WITHOUT (static honeypot)",true(),scenario)
+| stats avg(dwell_seconds) as "Avg dwell (s)" by cohort
+| eval "Avg dwell (s)"=round('Avg dwell (s)',0)
+| sort - "Avg dwell (s)"</query>
+          <earliest>-25h</earliest>
+          <latest>now</latest>
+          <refresh>30s</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.showDataLabels">all</option>
+        <option name="charting.axisTitleY.text">Average dwell time (seconds)</option>
+        <option name="charting.axisTitleX.text">Cohort</option>
+        <option name="charting.legend.placement">none</option>
+        <option name="charting.fieldColors">{"WITH CHIMERA":0x2ca02c,"WITHOUT (static honeypot)":0x999999}</option>
+        <option name="height">320</option>
+        <option name="charting.drilldown">none</option>
+      </chart>
+    </panel>
+  </row>
+
+  <!-- ================= ROW 2: HEADLINE SINGLE VALUES ================= -->
+  <row>
+    <panel>
+      <title>Penetration Probability (sessions escaped containment / total)</title>
+      <single>
+        <search>
+          <query>index=idx_deception type=session_summary
+| eval escaped=if(isnull(penetration_escaped),0,penetration_escaped)
+| stats sum(escaped) as escaped count as total
+| eval pen_prob=round(if(total=0,0,escaped/total)*100,2)
+| fields pen_prob</query>
+          <earliest>-25h</earliest>
+          <latest>now</latest>
+          <refresh>30s</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="field">pen_prob</option>
+        <option name="unit">%</option>
+        <option name="numberPrecision">0.00</option>
+        <option name="rangeColors">["0x53a051","0x53a051","0xf8be34","0xdc4e41"]</option>
+        <option name="rangeValues">[1,5,20]</option>
+        <option name="useColors">1</option>
+        <option name="colorMode">block</option>
+        <option name="drilldown">none</option>
+        <option name="height">160</option>
+      </single>
+      <html>
+        <div style="padding:0 10px 6px 10px;color:#888;font-size:11px;">
+          Definition: penetration_escaped = number of sessions that escalated past honeypot containment.
+          By architecture this is 0 — routed attackers stay inside the deception layer — so the gauge sits in the green range near 0%.
+        </div>
+      </html>
+    </panel>
+    <panel>
+      <title>Avg Dwell — WITH CHIMERA (s)</title>
+      <single>
+        <search>
+          <query>index=idx_deception type=session_summary synthetic=true scenario=chimera_adaptive
+| stats avg(dwell_seconds) as v | eval v=round(v,0)</query>
+          <earliest>-25h</earliest>
+          <latest>now</latest>
+          <refresh>30s</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="field">v</option>
+        <option name="unit">s</option>
+        <option name="colorMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="height">160</option>
+        <option name="rangeColors">["0x53a051","0x53a051"]</option>
+      </single>
+    </panel>
+    <panel>
+      <title>Avg Dwell — WITHOUT (static honeypot, s)</title>
+      <single>
+        <search>
+          <query>index=idx_deception type=session_summary synthetic=true scenario=baseline_static_honeypot
+| stats avg(dwell_seconds) as v | eval v=round(v,0)</query>
+          <earliest>-25h</earliest>
+          <latest>now</latest>
+          <refresh>30s</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="field">v</option>
+        <option name="unit">s</option>
+        <option name="colorMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="height">160</option>
+        <option name="rangeColors">["0x999999","0x999999"]</option>
+      </single>
+    </panel>
+  </row>
+
+  <!-- ================= ROW 3: DWELL OVER TIME ================= -->
+  <row>
+    <panel>
+      <title>Dwell Time Over Time (avg dwell_seconds per hour, last 24h)</title>
+      <html>
+        <div style="padding:4px 10px 0 10px;color:#888;font-size:11px;">
+          Plotted on the session's true engagement time (eval _time=ts). Synthetic demo cohorts are spread across the last 24h;
+          any live orchestrator sessions (sub-second FAST seeds) also appear here.
+        </div>
+      </html>
+      <chart>
+        <search>
+          <query>index=idx_deception type=session_summary NOT scenario IN (probe_test,timecheck,timecheck2)
+| eval _time=if(isnull(ts),_time,ts)
+| timechart span=1h avg(dwell_seconds) as "Avg dwell (s)"</query>
+          <earliest>-25h</earliest>
+          <latest>now</latest>
+          <refresh>30s</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="charting.chart">line</option>
+        <option name="charting.axisTitleY.text">Average dwell (seconds)</option>
+        <option name="charting.axisTitleX.text">Time (engagement)</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.legend.placement">bottom</option>
+        <option name="height">280</option>
+        <option name="charting.drilldown">none</option>
+      </chart>
+    </panel>
+  </row>
+
+  <!-- ================= ROW 4: LIVE BELIEF STATE ================= -->
+  <row>
+    <panel>
+      <title>Live Belief State (latest POMDP action &amp; belief per session)</title>
+      <html>
+        <div style="padding:4px 10px 0 10px;color:#888;font-size:11px;">
+          From type=deception_action. One row per session showing the most recent POMDP decision: belief over
+          {benign, human, ai} and the chosen breadcrumb intensity (none/subtle/moderate/aggressive).
+        </div>
+      </html>
+      <table>
+        <search>
+          <query>index=idx_deception type=deception_action
+| eval et=if(isnull(ts),_time,ts)
+| sort 0 - et
+| dedup session
+| eval "P(benign)"=round('belief.benign',3), "P(human)"=round('belief.human',3), "P(ai)"=round('belief.ai',3)
+| eval "last seen"=strftime(et,"%Y-%m-%d %H:%M:%S")
+| table "last seen" src_ip session action "P(benign)" "P(human)" "P(ai)" scenario
+| sort - "P(ai)"</query>
+          <earliest>-25h</earliest>
+          <latest>now</latest>
+          <refresh>30s</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="count">25</option>
+        <option name="drilldown">none</option>
+        <option name="wrap">true</option>
+        <format type="color" field="action">
+          <colorPalette type="map">{"aggressive":#dc4e41,"moderate":#f8be34,"subtle":#1182f3,"none":#53a051}</colorPalette>
+        </format>
+        <format type="color" field="P(ai)">
+          <colorPalette type="minMidMax" maxColor="#dc4e41" midColor="#f8be34" minColor="#53a051"></colorPalette>
+          <scale type="minMidMax" minValue="0" midValue="0.5" maxValue="1"></scale>
+        </format>
+      </table>
+    </panel>
+  </row>
+
+  <!-- ================= ROW 5: DWELL DISTRIBUTION BY CLASS ================= -->
+  <row>
+    <panel>
+      <title>CHIMERA Dwell by Attacker Class (avg dwell_seconds, WITH CHIMERA cohort)</title>
+      <chart>
+        <search>
+          <query>index=idx_deception type=session_summary synthetic=true scenario=chimera_adaptive
+| stats avg(dwell_seconds) as "Avg dwell (s)" count as sessions by classification
+| eval "Avg dwell (s)"=round('Avg dwell (s)',0)
+| sort - "Avg dwell (s)"</query>
+          <earliest>-25h</earliest>
+          <latest>now</latest>
+          <refresh>30s</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="charting.chart">bar</option>
+        <option name="charting.chart.showDataLabels">all</option>
+        <option name="charting.axisTitleX.text">Average dwell (seconds)</option>
+        <option name="charting.legend.placement">none</option>
+        <option name="height">260</option>
+        <option name="charting.drilldown">none</option>
+      </chart>
+    </panel>
+  </row>
+</dashboard>

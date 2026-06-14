@@ -1,0 +1,158 @@
+# CHIMERA — P04 honeypot/sensor stack (infra-builder).
+#
+# Services:
+#   suricata  — IDS, EVE JSON (alert/flow/http) -> suricata_logs volume
+#   cowrie    — SSH honeypot on host 127.0.0.1:2222, JSON -> cowrie_logs volume
+#   galah     — LLM HTTP honeypot on host 127.0.0.1:8080, JSON -> galah_logs volume
+#
+# NETWORK ISOLATION (design intent: a popped honeypot must not pivot into anything real)
+# ------------------------------------------------------------------------------------
+# `chimera_dmz` is an "internal: false" bridge but we deliberately give it a private
+# subnet (172.30.0.0/16) with no relation to the host mgmt LAN (192.168.1.0/24).
+# Honeypots are reachable from the host ONLY via explicit 127.0.0.1 port maps
+# (Cowrie 2222, Galah 8080) — never on the LAN. We keep the bridge non-internal so
+# Galah can reach the host's Ollama for LLM responses (Tier 1 design), but inbound
+# attacker reach is loopback-only. Tightening to a fully `internal: true` segment
+# (zero egress) is a later-packet hardening step once the LLM backend moves on-net.
+#
+# WHY NOT internal:true now? Galah needs egress to the host Ollama (host.docker.internal)
+# for the LLM provider; an internal bridge would block that. Cowrie/Suricata don't need
+# egress, but they share the one DMZ bridge for simplicity in Tier 1.
+
+networks:
+  chimera_dmz:
+    name: chimera_dmz
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.30.0.0/16
+          gateway: 172.30.0.1
+
+volumes:
+  suricata_logs:
+    name: chimera_suricata_logs
+  cowrie_logs:
+    name: chimera_cowrie_logs
+  galah_logs:
+    name: chimera_galah_logs
+  beelzebub_logs:
+    name: chimera_beelzebub_logs
+
+services:
+  # ---------------------------------------------------------------------------
+  # Suricata IDS — af-packet capture on the container's eth0 (chimera_dmz side).
+  # Wi-Fi host has no wired gateway to mirror; capturing the bridge iface lets
+  # the AFP capture thread start cleanly and emit eve.json. NET_ADMIN/NET_RAW +
+  # sys_nice let the entrypoint drop to the suricata user and sniff.
+  # ---------------------------------------------------------------------------
+  suricata:
+    image: jasonish/suricata:latest
+    container_name: chimera_suricata
+    restart: unless-stopped
+    networks:
+      - chimera_dmz
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+      - SYS_NICE
+    volumes:
+      # Mount OUTSIDE /etc/suricata: the image entrypoint does a recursive chown
+      # of /etc/suricata which fails (and crash-loops) on a read-only mount.
+      - ./suricata/suricata.yaml:/etc/chimera/suricata.yaml:ro
+      - suricata_logs:/var/log/suricata
+    # -i eth0: capture the container bridge iface. -v: verbose so init logs show.
+    command: ["-c", "/etc/chimera/suricata.yaml", "-i", "eth0", "-v"]
+
+  # ---------------------------------------------------------------------------
+  # Cowrie SSH honeypot. Host 127.0.0.1:2222 -> container 2222 (loopback-only
+  # for safety; smoke test connects from localhost). JSON -> cowrie_logs volume.
+  # ---------------------------------------------------------------------------
+  cowrie:
+    image: cowrie/cowrie:latest
+    container_name: chimera_cowrie
+    restart: unless-stopped
+    networks:
+      - chimera_dmz
+    ports:
+      - "127.0.0.1:2222:2222"
+    volumes:
+      - ./cowrie/cowrie.cfg:/cowrie/cowrie-git/etc/cowrie.cfg:ro
+      - cowrie_logs:/cowrie/cowrie-git/var/log/cowrie
+
+  # ---------------------------------------------------------------------------
+  # Galah LLM HTTP honeypot (upstream 0x4D31/galah). No prebuilt image exists,
+  # so we build from the upstream git context. Points at the host Ollama as the
+  # LLM provider (Tier 1). Host 127.0.0.1:8080 -> container 8080.
+  #
+  # NOTE: in Tier 1 no model is pulled into Ollama yet (Foundation-Sec arrives in
+  # P12), so per-request LLM calls will error — but Galah still STARTS, binds
+  # 8080, and writes JSON events to the volume, satisfying P04.
+  # ---------------------------------------------------------------------------
+  galah:
+    build:
+      context: ./galah
+      dockerfile: Dockerfile
+    image: chimera/galah:p04
+    container_name: chimera_galah
+    restart: unless-stopped
+    networks:
+      - chimera_dmz
+    ports:
+      - "127.0.0.1:8080:8080"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - ./galah/config.yaml:/galah/config/config.yaml:ro
+      - galah_logs:/galah/logs
+    # Ollama provider (P12 wired): model is the pulled Foundation-Sec-8B port.
+    # Galah requires --provider and --model; --server-url points at host Ollama.
+    # Ollama binds 0.0.0.0 (systemd override OLLAMA_HOST=0.0.0.0). We point at the
+    # chimera_dmz bridge GATEWAY (172.30.0.1) rather than host.docker.internal:
+    # the latter resolves to docker0's gateway (172.17.0.1), which a container on
+    # chimera_dmz cannot reach across bridges (UFW default-deny-routed times it
+    # out). 172.30.0.1 is this container's own gateway and the host listens there.
+    command:
+      - "--provider=ollama"
+      - "--model=FenkoHQ/Foundation-Sec-8B"
+      - "--server-url=http://172.30.0.1:11434"
+      - "--config-file=config/config.yaml"
+      - "--event-log-file=logs/galah.json"
+      - "--cache-db-file=logs/cache.db"
+      - "--log-level=info"
+
+  # ---------------------------------------------------------------------------
+  # Beelzebub MCP decoy (P10a) — the inverted-PromptArmor MCP tripwire (Channel 3
+  # of the AI/human classifier). Exposes a single decoy MCP tool
+  # ("tool:user-account-manager") over a streamable-HTTP MCP endpoint. A human
+  # never calls it; an autonomous LLM agent that invokes the tool fingerprints
+  # itself as AI. Every tool invocation is logged as JSON to the beelzebub_logs
+  # volume, tailed by the UF -> idx_honeypot, sourcetype=beelzebub:json.
+  #
+  # No prebuilt image is pullable (mariocandela/beelzebub:latest -> access denied
+  # on Docker Hub), so we build from upstream git like Galah (see ./beelzebub/
+  # Dockerfile). Bound to host 127.0.0.1:8092 (8000 is Splunk Web) -> container
+  # :8000 (the MCP address in services/mcp-8000.yaml). Loopback-only inbound,
+  # matching Cowrie/Galah isolation. Only the MCP service is configured, so no
+  # other beelzebub ports (22/23/80/...) are opened.
+  #
+  # NOTE: logsPath in the beelzebub-labs v3 fork is a FILE, not a dir — the core
+  # config points it at /beelzebub/logs/beelzebub.json inside the volume.
+  beelzebub:
+    build:
+      context: ./beelzebub
+      dockerfile: Dockerfile
+    image: chimera/beelzebub:p10a
+    container_name: chimera_beelzebub
+    restart: unless-stopped
+    networks:
+      - chimera_dmz
+    ports:
+      - "127.0.0.1:8092:8000"
+    volumes:
+      - ./beelzebub/beelzebub.yaml:/beelzebub/configurations/beelzebub.yaml:ro
+      - ./beelzebub/services:/beelzebub/configurations/services:ro
+      - beelzebub_logs:/beelzebub/logs
+    command:
+      - "--conf-core=/beelzebub/configurations/beelzebub.yaml"
+      - "--conf-services=/beelzebub/configurations/services/"
+      - "--log-level=info"

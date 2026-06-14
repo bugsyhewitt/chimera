@@ -1,0 +1,55 @@
+<dashboard version="1.1" theme="dark">
+  <label>CHIMERA Overview</label>
+  <description>Live deception-orchestrator overview: intrusions, honeypot interactions, and orchestrator decisions (auto-refresh 30s).</description>
+  <row>
+    <panel>
+      <title>Recent Intrusions (idx_network, last 60 min)</title>
+      <table>
+        <search>
+          <query>index=idx_network | head 100 | table _time src_ip dst_port signature | sort - _time</query>
+          <earliest>-60m</earliest>
+          <latest>now</latest>
+          <refresh>30s</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="count">20</option>
+        <option name="drilldown">none</option>
+        <option name="wrap">true</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Honeypot Interactions (idx_honeypot, last 60 min)</title>
+      <table>
+        <search>
+          <query>index=idx_honeypot | head 100 | table _time session_id src_ip eventid command | sort - _time</query>
+          <earliest>-60m</earliest>
+          <latest>now</latest>
+          <refresh>30s</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="count">20</option>
+        <option name="drilldown">none</option>
+        <option name="wrap">true</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Orchestrator Decisions (idx_deception, last 60 min)</title>
+      <table>
+        <search>
+          <query>index=idx_deception | head 100 | table _time src_ip decision confidence | sort - _time</query>
+          <earliest>-60m</earliest>
+          <latest>now</latest>
+          <refresh>30s</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="count">20</option>
+        <option name="drilldown">none</option>
+        <option name="wrap">true</option>
+      </table>
+    </panel>
+  </row>
+</dashboard>

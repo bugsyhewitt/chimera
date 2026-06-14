@@ -1,0 +1,4 @@
+# Files/paths copied into worktree subagent checkouts even though gitignored.
+# Worktree code-writing agents need the .env (MCP token, endpoints) to run
+# verification commands against the live Splunk/Ollama instances.
+.env

@@ -1,0 +1,59 @@
+# ---- Secrets (NEVER commit) ----
+.env
+.env.*
+# ...but DO track the placeholder template (real values never committed):
+!.env.example
+*.token
+*token*
+*password*
+*.pem
+*.key
+splunk_mcp_token*
+
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+*.egg-info/
+.eggs/
+dist/
+build/
+.venv/
+venv/
+env/
+.uv/
+uv.lock.bak
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# ---- Splunk artifacts ----
+*.tgz
+splunk-app/local/
+splunk-app/*/local/
+# Runtime metadata Splunk writes (as the splunk user) into the symlinked app —
+# e.g. local.meta created when a saved search is persisted via REST. Not ours.
+local.meta
+**/local.meta
+*.bak
+
+# ---- Docker / honeypot runtime data ----
+infra/**/data/
+infra/**/var/
+infra/**/logs/
+*.log
+
+# ---- Model weights (pulled at runtime, never committed) ----
+models/
+*.gguf
+*.safetensors
+
+# ---- OS / editor ----
+.DS_Store
+*.swp
+*~
+.idea/
+.vscode/

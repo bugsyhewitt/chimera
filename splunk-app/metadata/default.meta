@@ -1,0 +1,7 @@
+# CHIMERA app object permissions
+[]
+access = read : [ * ], write : [ admin ]
+export = system
+
+[indexes]
+export = system

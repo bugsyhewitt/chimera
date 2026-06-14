@@ -1,0 +1,28 @@
+# CHIMERA P10a — Beelzebub CORE config (the --conf-core file).
+#
+# IMPORTANT: in the beelzebub-labs/beelzebub v3 fork, `logsPath` is a FILE path,
+# not a directory — the builder does os.OpenFile(logsPath, O_APPEND|O_CREATE) and
+# attaches a logrus JSONFormatter to it. So we point it at a concrete .json file
+# inside the mounted /beelzebub/logs volume. Every TraceEvent (incl. MCP
+# tools/call invocations) is written there as one JSON object per line, which the
+# Universal Forwarder then tails -> idx_honeypot, sourcetype=beelzebub:json.
+#
+# logDisableTimestamp:false keeps logrus's own `time` key so the UF has a sane
+# event time even though our props falls back to index-time if needed.
+core:
+  logging:
+    debug: false
+    debugReportCaller: false
+    logDisableTimestamp: false
+    logsPath: /beelzebub/logs/beelzebub.json
+  tracings:
+    rabbit-mq:
+      enabled: false
+      uri: ""
+  prometheus:
+    path: "/metrics"
+    port: ":2112"
+  beelzebub-cloud:
+    enabled: false
+    uri: ""
+    auth-token: ""
