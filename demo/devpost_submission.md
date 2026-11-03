@@ -13,7 +13,7 @@ A Splunk-native AI agent that detects intruders with a *provable* error bound, w
 
 **Links:**
 - Demo video: `<TODO: unlisted YouTube URL>`
-- Public repo: `<TODO: github.com/<V3X org>/chimera>`
+- Public repo: `<TODO: github.com/<org>/chimera>`
 
 ---
 
@@ -41,7 +41,7 @@ Splunk Enterprise 10.4 + the Splunk MCP Server app (the orchestrator is an MCP c
 Operationalizing known-good math (Wald's SPRT, sequential AI/human classification, a POMDP engagement policy) as a single running Splunk-native agent — and inverting a 2026 defense (PromptArmor) into an offensive AI-attacker fingerprint via an MCP decoy.
 
 ## What's next
-Physically actuating the POMDP breadcrumb policy on the live honeypots (v1 records the chosen action), a Splunk Cloud demo to add the hosted AI Assistant SPL tools, and the V3X commercial detection plugins that snap into the documented open-core backend interface.
+Physically actuating the POMDP breadcrumb policy on the live honeypots (v1 records the chosen action), a Splunk Cloud demo to add the hosted AI Assistant SPL tools, and detection plugins that snap into the documented open-core backend interface.
 
 ## Built with
 splunk, splunk-mcp-server, model-context-protocol, python, asyncio, docker, cowrie, galah, beelzebub, suricata, ollama, foundation-sec-8b, mitre-attack, mitre-engage

@@ -1,6 +1,6 @@
 # CHIMERA — 3-Minute Demo Video Script
 
-**Submission:** V3X — Splunk Agentic Ops Hackathon, Security track
+**Submission:** Splunk Agentic Ops Hackathon, Security track
 **Runtime target:** 3:00. Spoken word count ≈ 430 (see footer).
 **Format:** Each beat lists **[SCREEN]** (what the viewer sees) and **[VO]** (spoken narration). Read the VO aloud at a natural pace; the time budget assumes ~150 wpm.
 
@@ -67,7 +67,7 @@
 **[VO]**
 "Here's the payoff. Attacker dwell time with CHIMERA: about 821 seconds, versus 49 for a static honeypot — sixteen-point-seven times longer engagement — while penetration probability stays near zero. That single chart maps to all four prize tracks: a novel deception wedge with provable-error math, blue-team deception mapped to MITRE Engage, an MCP-client orchestrator whose tripwire is itself an MCP decoy, and a hosted model doing real analyst work. CHIMERA. Detect, deceive, adapt."
 
-**[SCREEN]** End card: **CHIMERA — V3X.** Sub-line: *"Open framework; commercial detection plugins available separately."*
+**[SCREEN]** End card: **CHIMERA.** Sub-line: *"Open framework; detection plugins integrate via the backend interface."*
 
 ---
 

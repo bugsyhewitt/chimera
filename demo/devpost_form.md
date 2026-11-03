@@ -67,7 +67,7 @@ That the strongest agentic-SOC story isn't "we invented an algorithm in four wee
 
 ## What's next
 
-Physically actuating the POMDP breadcrumb policy on the live honeypots (v1 records the chosen action), a Splunk Cloud demo to add the hosted AI Assistant SPL tools, and the V3X commercial detection plugins that snap into the documented open-core backend interface.
+Physically actuating the POMDP breadcrumb policy on the live honeypots (v1 records the chosen action), a Splunk Cloud demo to add the hosted AI Assistant SPL tools, and detection plugins that snap into the documented open-core backend interface.
 
 ---
 
@@ -84,8 +84,8 @@ python, asyncio, uv, splunk, splunk-enterprise, splunk-mcp-server, model-context
 
 ## Additional info (judges/organizers)
 
-- **Submitter Type:** *Your call.* Submitting as the team → **Organization**; solo → **Individual**. (The project is branded V3X throughout.)
-- **Organization name:** `V3X` (or `N/A` if you submit as an individual).
+- **Submitter Type:** *Your call.* Submitting as the team → **Organization**; solo → **Individual**.
+- **Organization name:** `N/A` (individual submission).
 - **Government / state-owned entity:** `No` *(confirm — this is a factual question only you can answer).*
 - **Country of Residence:** `<your country>`
 - **Canada province:** `N/A` *(unless you reside in Canada).*

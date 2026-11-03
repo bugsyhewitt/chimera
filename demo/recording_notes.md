@@ -85,8 +85,8 @@ Tips:
    `SPRT → HOSTILE · Λ=5.7 · α=0.01, β=0.05` and `MCP tripwire fired → AI · p_ai=0.9997`.
 4. **Scene: Splunk overview** — browser on `chimera_overview`.
 5. **Scene: Splunk metrics** — browser on `chimera_metrics` for the closer.
-6. **Scene: End card** — `CHIMERA — V3X` / "Open framework; commercial detection
-   plugins available separately."
+6. **Scene: End card** — `CHIMERA` / "Open framework; detection
+   plugins integrate via the backend interface."
 
 Capture at 1080p, 30fps; record system audio + mic separately if possible. Keep the
 total at **3:00**; the VO budget (~430 words) is in `demo_script.md`.
@@ -97,7 +97,7 @@ total at **3:00**; the VO budget (~430 words) is in `demo_script.md`.
       passwords, MCP bearer token, Splunk login).
 - [ ] Upload to YouTube **as Unlisted** (not Private — judges must be able to view via
       link; not Public unless the team decides).
-- [ ] Title: `CHIMERA — Splunk Agentic Ops Hackathon (V3X)`.
+- [ ] Title: `CHIMERA — Splunk Agentic Ops Hackathon`.
 - [ ] Paste the link into `README.md` at `<!-- TODO: video link -->` and remove the
       placeholder comment.
 - [ ] Sanity-check the link in an incognito window before submitting.

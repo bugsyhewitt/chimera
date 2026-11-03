@@ -9,8 +9,8 @@ Splunk-native AI agent that detects intruders via SPRT, routes hostile traffic t
 - Use the subagent team. Worktree isolation for code writers.
 - Update STATUS.md after every packet.
 
-## V3X identity
-This is a public open-source submission by V3X. The orchestration framework is the submission. V3X's commercial detection plugins are NOT in this repo — they plug in via the documented backend interface in `orchestrator/chimera/`. Do not copy Pho3nix, AlienClaw, or other V3X-proprietary code into this repo.
+## Project identity
+This is a public open-source project. The orchestration framework is the submission. Commercial detection plugins are NOT in this repo — they plug in via the documented backend interface in `orchestrator/chimera/`. Do not copy code from other projects into this repo.
 
 ## Stack
 - Ubuntu Server 24.04

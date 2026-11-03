@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1320" viewBox="0 0 1080 1320" font-family="Segoe UI, Helvetica, Arial, sans-serif">
-  <!-- ================= CHIMERA architecture (V3X) ================= -->
+  <!-- ================= CHIMERA architecture ================= -->
   <!-- Layered: sensors+honeypots (isolated net) -> UF -> Splunk core -> orchestrator loop -> dashboard -->
 
   <defs>
@@ -109,7 +109,7 @@
 
   <!-- ============ LAYER 4: ORCHESTRATOR LOOP ============ -->
   <rect class="layer" x="40" y="620" width="1000" height="430" rx="10" fill="#eef6f1" stroke="#0b6e4f"/>
-  <text class="ltitle" x="60" y="642" fill="#0b6e4f">CHIMERA ORCHESTRATOR — the V3X submission (async Python, MCP client)</text>
+  <text class="ltitle" x="60" y="642" fill="#0b6e4f">CHIMERA ORCHESTRATOR — the submission (async Python, MCP client)</text>
 
   <!-- Row A: detect -> SPRT -> router -->
   <rect class="box" x="64" y="660" width="200" height="74" fill="#ffffff" stroke="#0b6e4f"/>
@@ -187,6 +187,6 @@
   <line x1="740" y1="1214" x2="780" y2="1214" stroke="#0b6e4f" stroke-width="2" marker-end="url(#arrowLoop)"/>
   <text x="788" y="1218" font-size="11.5" fill="#0b6e4f">orchestrator loop</text>
 
-  <text x="540" y="1262" text-anchor="middle" font-size="12" fill="#5a6472">V3X — Splunk Agentic Ops Hackathon, Security track. Open framework; commercial detection plugins available separately.</text>
+  <text x="540" y="1262" text-anchor="middle" font-size="12" fill="#5a6472">Splunk Agentic Ops Hackathon, Security track. Open framework; detection plugins integrate via the backend interface.</text>
   <text x="540" y="1284" text-anchor="middle" font-size="11" fill="#9aa3b0">Stack: Splunk Enterprise 10.4.0 + MCP Server · Suricata/Zeek · Cowrie/Galah/Beelzebub · Universal Forwarder · Python asyncio orchestrator · Foundation-Sec-8B (Ollama)</text>
 </svg>

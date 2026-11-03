@@ -16,6 +16,6 @@ Rules:
 - README must have: title, one-sentence pitch, prize tracks claimed, quickstart commands, architecture diagram embedded, link to demo video, license.
 - Architecture diagram: SVG, not PNG. Hand-write the SVG or use a Mermaid → SVG export.
 - Demo video script must hit the impact metric (dwell time up, penetration probability near zero) in the final 30 seconds.
-- DO NOT mention V3X proprietary products in the README. Mention V3X as the submitting team. The open-core line ("commercial detection plugins available separately") is fine and recommended.
+- DO NOT mention proprietary products in the README. The open-core line ("detection plugins integrate via the backend interface") is fine and recommended.
 
 When done with a packet, update STATUS.md, exit.

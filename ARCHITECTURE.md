@@ -34,7 +34,7 @@ Splunk for both reads and write-back.
    (Cowrie/Galah/Beelzebub), `idx_deception` (CHIMERA's own decisions) — plus the
    **Splunk MCP Server** app (MCP TA 1.2.0), which exposes search as agent-callable
    tools over streamable HTTP with OAuth 2.1 bearer auth.
-5. **Orchestrator (the V3X submission).** An async Python 3.12 service that is an
+5. **Orchestrator (the submission).** An async Python 3.12 service that is an
    **MCP client**: it reads events through MCP, runs the math, and writes decisions
    back. This is `orchestrator/chimera/`.
 6. **Presentation.** The CHIMERA Splunk app: `chimera_overview` (live loop) and
@@ -176,8 +176,8 @@ the attacking agent connects to — so MCP is both the reasoning plane and a sen
 ## 6. Open-core IP boundary
 
 This repository is the **open-source orchestration framework** (MIT). It defines the
-full closed loop and a clean backend interface in `orchestrator/chimera/`. V3X's
-**commercial detection plugins are available separately** and plug in via that
+full closed loop and a clean backend interface in `orchestrator/chimera/`.
+Detection plugins plug in via that
 interface — no proprietary code is vendored here. CHIMERA is therefore complete and
 runnable as published, while the commercial plugins extend detection fidelity behind
 the same contract.

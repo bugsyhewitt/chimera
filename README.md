@@ -2,7 +2,7 @@
 
 **A Splunk-native AI deception agent that detects an intruder with a *provable* error bound, figures out whether it's facing a human or an autonomous AI agent, and adapts its honeypot deception to waste each one's time — while keeping the chance of a real breach near zero.**
 
-Submitted by **V3X** to the **Splunk Agentic Ops Hackathon — Security track**.
+Built for the **Splunk Agentic Ops Hackathon — Security track**.
 
 ![CHIMERA architecture](architecture_diagram.png)
 
@@ -85,7 +85,7 @@ A walkthrough (human vs AI against the same honeypot, the SPRT bound crossing, t
 
 | Path | What |
 |---|---|
-| `orchestrator/` | The V3X submission — async Python MCP-client agent (SPRT, classifier, POMDP, reporter, write-back). 135 tests pass. |
+| `orchestrator/` | The submission — async Python MCP-client agent (SPRT, classifier, POMDP, reporter, write-back). 135 tests pass. |
 | `infra/` | Docker Compose stack: Suricata, Cowrie, Galah, Beelzebub + forwarder config. |
 | `splunk-app/` | CHIMERA Splunk app: indexes, saved searches, `chimera_overview` / `chimera_metrics` dashboards. |
 | `scripts/` | UF installer, attacker seeds, smoke test, demo seeder. |
@@ -93,9 +93,9 @@ A walkthrough (human vs AI against the same honeypot, the SPRT bound crossing, t
 
 ## License & attribution
 
-**MIT** — see [LICENSE](LICENSE). © 2026 **V3X**.
+**MIT** — see [LICENSE](LICENSE).
 
-**Open-core notice.** This repository is the open-source orchestration framework. V3X's commercial detection plugins are available separately; they integrate via the documented backend interface in `orchestrator/chimera/`. No proprietary code is included here.
+**Open-core notice.** This repository is the open-source orchestration framework. Detection plugins integrate via the documented backend interface in `orchestrator/chimera/`. No proprietary code is included here.
 
 ## Prior art (honest credits)
 

@@ -13,7 +13,7 @@ C0='\033[0m'; B='\033[1m'; CY='\033[1;36m'; GR='\033[1;32m'; YE='\033[1;33m'; MG
 pause(){ sleep "${1:-2}"; }
 type_out(){ printf "${WH}\$ ${C0}"; local s="$1"; for ((i=0;i<${#s};i++)); do printf "%s" "${s:$i:1}"; sleep 0.014; done; printf "\n"; sleep .3; }
 vo(){ :; }   # narration is spoken by the operator over the video — not printed on screen
-slide(){ clear; printf "${DIM}  CHIMERA · V3X · Splunk Agentic Ops Hackathon${C0}\n"; printf "${CY}${B}  ▌ %s${C0}\n  ${DIM}────────────────────────────────────────────────────────────────────${C0}\n\n" "$1"; }
+slide(){ clear; printf "${DIM}  CHIMERA · Splunk Agentic Ops Hackathon${C0}\n"; printf "${CY}${B}  ▌ %s${C0}\n  ${DIM}────────────────────────────────────────────────────────────────────${C0}\n\n" "$1"; }
 spl(){ curl -k -s -u "$AUTH" "$MGMT/services/search/jobs" --data-urlencode "search=$1" -d exec_mode=oneshot -d output_mode=json -d earliest_time=0 --max-time 25 2>/dev/null; }
 
 # ============================== TITLE ==============================
@@ -28,7 +28,7 @@ cat <<'EOF'
 EOF
 printf "\n${B}    A Splunk-native AI deception agent${C0}\n"
 printf "    ${WH}detect ▸ classify human-vs-AI ▸ adapt deception ▸ report — all through Splunk + MCP${C0}\n"
-printf "\n${DIM}    V3X · Splunk Agentic Ops Hackathon · Security track${C0}\n"
+printf "\n${DIM}    Splunk Agentic Ops Hackathon · Security track${C0}\n"
 pause 6
 
 # ============================== THE PROBLEM ==============================
@@ -114,7 +114,7 @@ printf "   ${WH}detect ▸ route ▸ classify human-vs-AI ▸ deceive ▸ report
 printf "   ${GR}✓${C0} Wald SPRT, provable α/β bounds      ${GR}✓${C0} inverted-PromptArmor MCP tripwire\n"
 printf "   ${GR}✓${C0} POMDP adaptive deception            ${GR}✓${C0} Foundation-Sec-8B reports + write-back\n\n"
 printf "   ${YE}${B}16.7× attacker dwell time${C0}   ·   penetration probability ${GR}${B}~0%%${C0}\n\n"
-printf "   ${CY}${B}V3X${C0} ${DIM}· open-core: commercial detection plugins available separately${C0}\n"
+printf "   ${DIM}open-core: detection plugins integrate via the backend interface${C0}\n"
 pause 9
 touch /tmp/demo_done
 sleep 1
